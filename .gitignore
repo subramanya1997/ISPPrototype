@@ -1,5 +1,5 @@
 .DS_Store
 .ipynb_checkpoints
 __pycache__
-data/*
+data
 secret_key.txt
