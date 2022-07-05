@@ -1,0 +1,1 @@
+This directory stores the database, sequestered away from the code and the main project directory.
