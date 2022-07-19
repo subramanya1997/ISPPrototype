@@ -1,0 +1,6 @@
+{% macro tag(text) %}
+<div class="btn-group m-1" role="group" aria-label="Basic example">
+    <button type="text" class="btn btn-outline-dark disabled">{{text}}</button>
+    <button type="button" class="btn btn-danger" onclick="tagDelete(this)"><i class="fa fa-times"></i></button>
+</div>
+{% endmacro %}

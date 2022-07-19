@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block variables %}
+{% endblock %}
+
+{% block content %}
+<div id="edit-main">
+    <div id="edit-canvas">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div id="edit-controls">
+        <a href="/">
+            <button id="cancel" type="button" class="btn btn-danger container-fluid my-1">Cancel</button>
+        </a>
+        <form id="save" name="saveData" action="/edit" method="POST" onsubmit="checkAndSubmit()" enctype="multipart/form-data">
+            <button type="submit" class="btn btn-success container-fluid my-1">Save</button>
+            <input type="file" id="hfile" name="file" accept=".svg" class="hide"/>
+            <input type="hidden" id="fdata" name="data" value="Hello"/>
+        </form>
+        <div class="divider"></div>
+        <input type="file" class="form-control container-fluid my-2" id="selectFileButton">
+        <input class="form-control container-fluid my-2" type="text" id="pName" name="name" placeholder="Project Name">
+        
+        <div class="btn-group container-fluid" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="pointMode" autocomplete="off" checked onclick="changeMode('point')">
+            <label class="btn btn-outline-dark" for="pointMode">Point</label>
+          
+            <input type="radio" class="btn-check" name="btnradio" id="PathMode" autocomplete="off" onclick="changeMode('path')">
+            <label class="btn btn-outline-dark" for="PathMode">Path</label>
+        </div>
+        
+        <div id="invTag">
+            <input class="form-control container-fluid my-2" type="text" id="pInventory" name="inventory" placeholder="Inventory List">
+            <div id="tags">
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block elements %}
+<script type="text/javascript" src="{{ url_for('static', filename='floorplan.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='edit.js') }}"></script>
+{% endblock %}

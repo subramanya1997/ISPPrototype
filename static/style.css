@@ -1,0 +1,33 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.2;
+    background-color: #eee;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#edit-main {
+    display: flex;
+    align-items: stretch;
+    height: 720px;
+}
+
+#edit-canvas{
+    margin: 4px 0 4px 4px;
+    flex: 1;
+    background: gainsboro;
+}
+
+#canvas{
+    align-self: center;
+}
+
+#edit-controls{
+    width: 300px;
+    margin: 10px;
+}
+
+.hide {
+    display: none;
+}

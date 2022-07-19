@@ -2,14 +2,14 @@ import os
 import re
 import time
 import argparse
+import json
 
 from flask import Flask, request, redirect, url_for
 from flask import render_template
 from flask import g # global session-level object
-from flask import session
-import pandas as pd
+from werkzeug.utils import secure_filename
 
-from aslite.db import get_test_db
+from aslite.db import get_projects_db
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Server')
@@ -31,28 +31,55 @@ if __name__ == '__main__':
         print("WARNING: no secret key found, using default devkey")
         sk = 'devkey'
     app.secret_key = sk
+    app.config['UPLOAD_FOLDER'] = "static/save/"
 
     if args.debug:
         app.config["ENV"] = "development"
         app.config["DEBUG"] = True
 
+    ALLOWED_EXTENSIONS = set(['svg'])
+    def allowed_file(filename):
+	    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
     # -----------------------------------------------------------------------------
     # globals that manage the (lazy) loading of various state for a request
     @app.before_request
-    def add_close():
-        pdb = get_test_db(flag='c')
-        for i in range(10):
-            pdb[i] = i + 1
+    def get_data():
+        if not hasattr(g, '_projects'):
+            g._projects = get_projects_db()
 
-        pdb.close()
+    @app.teardown_request
+    def close_connection(error=None):
+        if hasattr(g, '_projects'):
+            g._projects.close()
 
     @app.route("/")
     def hello():
-        tdb = get_test_db()
-        _t = ""
-        for i in range(10):
-            _t += f"{tdb[i]+1}_"
+        return render_template('index.html')
 
-        return f"Hello, World! {_t}"
+    @app.route("/edit")
+    def edit_page(filename=""):
+        return render_template('edit.html', filename=filename)
+
+    @app.route('/edit', methods=['POST'])
+    def upload_image():
+        print("upload_image..")
+        print(json.loads(request.form['data']), request.files['file'])
+        
+        if 'file' not in request.files:
+            print(1)
+            return render_template('edit.html')
+        file = request.files['file']
+        if file.filename == '':
+            print(2)
+            pass
+        if file and allowed_file(file.filename):
+            print(3)
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return render_template('edit.html', filename=filename)
+        else:
+            print(4)
+            return redirect(request.url)
 
     app.run()

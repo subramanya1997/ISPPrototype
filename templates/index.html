@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block variables %}
+{% endblock %}
+
+
+{% block content %}
+<div id="edit-main">
+    <div id="edit-canvas">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div id="edit-controls">
+        <form action="/edit" enctype="multipart/form-data">
+            <button id="create_project" class="btn edit">Create New</button>
+        </form> 
+    </div>
+</div>
+{% endblock %}

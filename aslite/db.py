@@ -90,8 +90,14 @@ class CompressedSqliteDict(SqliteDict):
 
 # test database
 TEST_DB_FILE = os.path.join(DATA_DIR, 'test.db')
+PROJECT_DB_FILE = os.path.join(DATA_DIR, 'project.db')
 
 def get_test_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     tdb = CompressedSqliteDict(TEST_DB_FILE, tablename='test', flag=flag, autocommit=autocommit)
+    return tdb
+
+def get_projects_db(flag='r', autocommit=True):
+    assert flag in ['r', 'c']
+    tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag=flag, autocommit=autocommit)
     return tdb
