@@ -101,3 +101,8 @@ def get_projects_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag=flag, autocommit=autocommit)
     return tdb
+
+def save_project_to_db(data, id):
+    tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag='c', autocommit=True)
+    tdb[id] = data
+    tdb.close()

@@ -3,13 +3,13 @@ import re
 import time
 import argparse
 import json
+import uuid
 
 from flask import Flask, request, redirect, url_for
 from flask import render_template
-from flask import g # global session-level object
 from werkzeug.utils import secure_filename
 
-from aslite.db import get_projects_db
+from aslite.db import get_projects_db, save_project_to_db
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Server')
@@ -42,16 +42,7 @@ if __name__ == '__main__':
 	    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
     # -----------------------------------------------------------------------------
-    # globals that manage the (lazy) loading of various state for a request
-    @app.before_request
-    def get_data():
-        if not hasattr(g, '_projects'):
-            g._projects = get_projects_db()
-
-    @app.teardown_request
-    def close_connection(error=None):
-        if hasattr(g, '_projects'):
-            g._projects.close()
+    # routes
 
     @app.route("/")
     def hello():
@@ -64,22 +55,23 @@ if __name__ == '__main__':
     @app.route('/edit', methods=['POST'])
     def upload_image():
         print("upload_image..")
-        print(json.loads(request.form['data']), request.files['file'])
+        
         
         if 'file' not in request.files:
-            print(1)
             return render_template('edit.html')
         file = request.files['file']
         if file.filename == '':
-            print(2)
-            pass
+            return render_template('edit.html')
         if file and allowed_file(file.filename):
-            print(3)
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            data = json.loads(request.form['hdata'])
+            data['id'] = str(uuid.uuid1())
+            data['name'] = request.form['name']
+            print(data)
+            save_project_to_db(data, data['id'])
             return render_template('edit.html', filename=filename)
         else:
-            print(4)
             return redirect(request.url)
 
     app.run()

@@ -182,6 +182,39 @@ class Floorplan {
         }
     }
 
+    getSaveData(){
+        var data = {
+            points : [],
+            paths : [],
+            imagePath : this.url,
+            offsets : this.offsets,
+            count : this.cnt,
+        }
+
+        for(var pnt of this.points){
+            var _invs = []
+            for(var inv of pnt.inventory){
+                _invs.push(inv)
+            }
+            data["points"].push({
+                name: pnt.name,
+                point: [pnt.x, pnt.y],
+                inventory: _invs
+            })
+        }
+
+        for(var [node, pth] of this.paths){
+            var _pnt = []
+            for(var _n of pth){
+                _pnt.push(_n)
+            }
+            data["paths"].push({
+                node : _pnt
+            })
+        }
+        return data
+    }
+
     printData(){
         console.log(this);
     }

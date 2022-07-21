@@ -12,14 +12,13 @@
         <a href="/">
             <button id="cancel" type="button" class="btn btn-danger container-fluid my-1">Cancel</button>
         </a>
-        <form id="save" name="saveData" action="/edit" method="POST" onsubmit="checkAndSubmit()" enctype="multipart/form-data">
+        <form id="saveForm" name="saveDataForm" action="/edit" method="POST" submit="checkAndSubmit(e)" enctype="multipart/form-data">
             <button type="submit" class="btn btn-success container-fluid my-1">Save</button>
-            <input type="file" id="hfile" name="file" accept=".svg" class="hide"/>
-            <input type="hidden" id="fdata" name="data" value="Hello"/>
+            <input type="hidden" id="hdata" name="hdata" value="data is not there!"/>
+            <input class="form-control container-fluid my-2" type="text" id="pName" name="name" placeholder="Project Name" required>
+            <input type="file" class="form-control container-fluid my-2" name="file" accept=".svg" id="selectFileButton" required>
         </form>
-        <div class="divider"></div>
-        <input type="file" class="form-control container-fluid my-2" id="selectFileButton">
-        <input class="form-control container-fluid my-2" type="text" id="pName" name="name" placeholder="Project Name">
+        
         
         <div class="btn-group container-fluid" role="group" aria-label="Basic radio toggle button group">
             <input type="radio" class="btn-check" name="btnradio" id="pointMode" autocomplete="off" checked onclick="changeMode('point')">

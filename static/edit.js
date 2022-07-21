@@ -1,7 +1,5 @@
 gVars = {}
 
-var url = 'static/save/fp1.svg';
-
 function init(){
     var canvas = document.getElementById('canvas');
     canvas.style.width ='100%';
@@ -31,7 +29,7 @@ function drawImageToCanvas(canvas, imgPath){
         }
         var xOffset = newWidth < canvas.width ? ((canvas.width - newWidth) / 2) : 0;
         var yOffset = newHeight < canvas.height ? ((canvas.height - newHeight) / 2) : 0;
-        gVars['floorPlan'].setFloorMap(imgPath, image, canvas.getContext('2d'), [xOffset, yOffset]);
+        gVars['floorPlan'].setFloorMap(gVars['pFloorPlan'].name, image, canvas.getContext('2d'), [xOffset, yOffset]);
     }
     image.src = imgPath;
     
@@ -46,11 +44,12 @@ function getPosition(event){
 init();
 var cancel = document.getElementById('cancel');
 var selectFileButton = document.getElementById('selectFileButton');
-var getFile = document.getElementById('getFile');
 var submitButton = document.querySelector('submit');
 var inventoryText = document.getElementById('pInventory');
 var invTag = document.getElementById('invTag');
 var tags = document.getElementById('tags');
+var form = document.getElementById('saveForm');
+form.addEventListener('submit', checkAndSubmit);
 changeMode(gVars['mode']);
 
 function changeMode(mode){
@@ -106,9 +105,11 @@ function resetPathMode(){
 
 }
 
-function checkAndSubmit(){
-    document.saveData.data.value = '{"name": "hello"}';
-    return true;
+function checkAndSubmit(e){
+    e.preventDefault();
+    data = gVars['floorPlan'].getSaveData();
+    document.saveDataForm.hdata.value = JSON.stringify(data);
+    form.submit();
 }
 
 cancel.onclick = function(){
@@ -179,10 +180,9 @@ function mouseClicked(e){
 
 selectFileButton.onchange = function(){
     const [file] = selectFileButton.files;
-    document.getElementById("hfile").files = selectFileButton.files;
     if (file) {
         gVars['pFloorPlan'] = file;
-        drawImageToCanvas(gVars['canvas'], URL.createObjectURL(file));
+        drawImageToCanvas(gVars['canvas'], URL.createObjectURL(gVars['pFloorPlan']));
     }
 }
 
@@ -191,11 +191,13 @@ function onkeydown(e){
         var ctx = gVars['canvas'].getContext('2d');
         gVars['floorPlan'].selectPoint(null, ctx);
     }
-    else if (e.shiftkey){
+    else if (e.shiftKey){
         console.log(gVars);
         gVars['floorPlan'].printData();
     }
+    else if (e.code == "KeyA"){
+        var data = gVars['floorPlan'].getSaveData();
+        console.log(data);
+    }
+
 }
-
-
-
