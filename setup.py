@@ -7,7 +7,7 @@ def setupProject():
 def init():
     
     #setup project
-    # setupProject()
-    delete_duplicate('project1')
+    setupProject()
+    # delete_duplicate('project1')
 
 init()
