@@ -208,5 +208,4 @@ function onkeydown(e){
         console.log(data);
         gVars['floorPlan'].printData();
     }
-
 }
