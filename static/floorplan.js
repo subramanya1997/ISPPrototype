@@ -58,7 +58,6 @@ class Floorplan {
     #drawLines(path, ctx){
         ctx.lineWidth = 8;
         ctx.strokeStyle = this.#getColor(path.isSelected);
-        console.log(path.isSelected);
         ctx.stroke(path);
     }
 
