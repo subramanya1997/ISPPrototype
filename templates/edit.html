@@ -15,17 +15,20 @@
         <form id="saveForm" name="saveDataForm" action="/edit" method="POST" submit="checkAndSubmit(e)" enctype="multipart/form-data">
             <button type="submit" class="btn btn-success container-fluid my-1">Save</button>
             <input type="hidden" id="hdata" name="hdata" value="data is not there!"/>
-            <input class="form-control container-fluid my-2" type="text" id="pName" name="name" placeholder="Project Name" required>
-            <input type="file" class="form-control container-fluid my-2" name="file" accept=".svg" id="selectFileButton" required>
+            <input class="form-control container-fluid my-2" id="projecct_name" type="text" id="pName" name="name" placeholder="Project Name" required>
+            <div class="custom-file container-fluid my-2">
+                <input type="file" class="custom-file-input" name="file" accept=".svg" id="selectFileButton" required>
+                <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+            </div>
         </form>
-        
-        
-        <div class="btn-group container-fluid" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" class="btn-check" name="btnradio" id="pointMode" autocomplete="off" checked onclick="changeMode('point')">
-            <label class="btn btn-outline-dark" for="pointMode">Point</label>
-          
-            <input type="radio" class="btn-check" name="btnradio" id="PathMode" autocomplete="off" onclick="changeMode('path')">
-            <label class="btn btn-outline-dark" for="PathMode">Path</label>
+
+        <div class="btn-group btn-group-toggle container-fluid" data-toggle="buttons">
+            <label class="btn btn-outline-dark active">
+              <input type="radio" name="options" id="option1" autocomplete="off" checked onchange="changeMode('point')"> Point
+            </label>
+            <label class="btn btn-outline-dark">
+              <input type="radio" name="options" id="option3" autocomplete="off" onchange="changeMode('path')"> Path
+            </label>
         </div>
         
         <div id="invTag">
@@ -39,6 +42,11 @@
 {% endblock %}
 
 {% block elements %}
+<script type="text/javascript" src="{{ url_for('static', filename='graph.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='floorplan.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='edit.js') }}"></script>
+<script>
+    var project = {{ project | tojson }};
+    initFloorplan(project);
+</script>
 {% endblock %}

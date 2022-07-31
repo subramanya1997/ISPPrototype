@@ -1,5 +1,4 @@
-from aslite.db import get_projects_db
-
+from aslite.db import get_projects_db, delete_duplicate
 
 def setupProject():
     temp = get_projects_db(flag='c')
@@ -8,6 +7,7 @@ def setupProject():
 def init():
     
     #setup project
-    setupProject()
+    # setupProject()
+    delete_duplicate('project1')
 
 init()

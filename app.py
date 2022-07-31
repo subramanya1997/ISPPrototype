@@ -9,7 +9,7 @@ from flask import Flask, request, redirect, url_for
 from flask import render_template
 from werkzeug.utils import secure_filename
 
-from aslite.db import get_projects_db, save_project_to_db
+from aslite.db import get_first_project, save_project_to_db, get_project_with_name
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Server')
@@ -45,18 +45,31 @@ if __name__ == '__main__':
     # routes
 
     @app.route("/")
-    def hello():
-        return render_template('index.html')
+    def index():
+        return redirect('/project')
+
+    @app.route("/project/")
+    def project():
+        firstProject = get_first_project()
+        return render_template('index.html', project=firstProject)
+
+    @app.route("/project/<name>")
+    def projectName(name = None):
+        project = get_project_with_name(name)
+        return render_template('index.html', project=project)
 
     @app.route("/edit")
-    def edit_page(filename=""):
-        return render_template('edit.html', filename=filename)
+    def edit_page():
+        _fields = request.args.to_dict()
+        filename = request.args['filename'] if 'filename' in _fields else None
+        project = None 
+        if filename != None:
+            project = get_project_with_name(filename)
+        return render_template('edit.html', project=project)
 
     @app.route('/edit', methods=['POST'])
     def upload_image():
         print("upload_image..")
-        
-        
         if 'file' not in request.files:
             return render_template('edit.html')
         file = request.files['file']
@@ -66,11 +79,11 @@ if __name__ == '__main__':
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             data = json.loads(request.form['hdata'])
-            data['id'] = str(uuid.uuid1())
+            data['id'] = str(uuid.uuid1()) if data['id'] == None else data['id']
             data['name'] = request.form['name']
             print(data)
             save_project_to_db(data, data['id'])
-            return render_template('edit.html', filename=filename)
+            return render_template('edit.html', project=None)
         else:
             return redirect(request.url)
 

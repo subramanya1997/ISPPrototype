@@ -10,11 +10,21 @@ function init(){
 
     /* Global scope */
     gVars['canvas'] = canvas;
-    gVars['floorPlan'] = new Floorplan();
-    gVars['mode'] = "point";
 
     canvas.addEventListener('mousedown', mouseClicked);
     document.addEventListener('keydown', onkeydown);
+}
+
+function initFloorplan(project){
+    if(project != null){
+        gVars['floorPlan'] = new Floorplan(project, gVars['canvas'].getContext('2d'));
+        projecct_name.value = project.name;
+    }else{
+        gVars['floorPlan'] = new Floorplan();
+    }
+    gVars['mode'] = "point";
+    
+    changeMode(gVars['mode'], false);
 }
 
 function drawImageToCanvas(canvas, imgPath){
@@ -32,7 +42,6 @@ function drawImageToCanvas(canvas, imgPath){
         gVars['floorPlan'].setFloorMap(gVars['pFloorPlan'].name, image, canvas.getContext('2d'), [xOffset, yOffset]);
     }
     image.src = imgPath;
-    
 }
 
 function getPosition(event){
@@ -44,26 +53,26 @@ function getPosition(event){
 init();
 var cancel = document.getElementById('cancel');
 var selectFileButton = document.getElementById('selectFileButton');
+var projecct_name = document.getElementById('projecct_name');
 var submitButton = document.querySelector('submit');
 var inventoryText = document.getElementById('pInventory');
 var invTag = document.getElementById('invTag');
 var tags = document.getElementById('tags');
 var form = document.getElementById('saveForm');
 form.addEventListener('submit', checkAndSubmit);
-changeMode(gVars['mode']);
 
-function changeMode(mode){
+function changeMode(mode, _draw = true){
     gVars['mode'] = mode;
     var ctx = gVars['canvas'].getContext('2d');
     if(gVars['mode'] == 'point'){
         gVars['canAddPoints'] = true;
         setPointMode(null);
-        gVars['floorPlan'].selectPoint(null, ctx);
+        gVars['floorPlan'].selectPoint(null, ctx, _draw);
     }
     else{
         gVars['canAddPoints'] = false;
         setPointMode(null);
-        gVars['floorPlan'].selectPoint(null, ctx);
+        gVars['floorPlan'].selectPoint(null, ctx, _draw);
     }
 }
 
@@ -144,7 +153,7 @@ function mouseClickedOnPointMode(ptn, ctx, isSelected, isDelete, x, y){
             gVars['floorPlan'].selectPoint(ptn, ctx);
             setPointMode(gVars['floorPlan'].pntSelected);
         }else{
-            ptn = gVars['floorPlan'].createPoint(x, y, ctx);
+            ptn = gVars['floorPlan'].createPoint(x, y);
             gVars['floorPlan'].selectPoint(ptn, ctx);
             setPointMode(gVars['floorPlan'].pntSelected);
         } 
@@ -168,13 +177,16 @@ function mouseClickedOnPathMode(ptn, ctx, isSelected, isDelete){
 }
 
 function mouseClicked(e){
+    if(e.which != 1){
+        return;
+    }
     var [x, y] = getPosition(e);
     var ctx = gVars['canvas'].getContext('2d');
-    var [isSelected, ptn] = gVars['floorPlan'].getPointUnder(x, y, ctx);
+    var [isSelected, pnt] = gVars['floorPlan'].getPointUnder(x, y, ctx);
     if(gVars['mode'] == "point"){
-        mouseClickedOnPointMode(ptn, ctx, isSelected, e.metaKey, x, y)
+        mouseClickedOnPointMode(pnt, ctx, isSelected, e.metaKey, x, y)
     }else{
-        mouseClickedOnPathMode(ptn, ctx, isSelected, e.metaKey)
+        mouseClickedOnPathMode(pnt, ctx, isSelected, e.metaKey)
     }
 }
 
@@ -191,13 +203,10 @@ function onkeydown(e){
         var ctx = gVars['canvas'].getContext('2d');
         gVars['floorPlan'].selectPoint(null, ctx);
     }
-    else if (e.shiftKey){
-        console.log(gVars);
-        gVars['floorPlan'].printData();
-    }
     else if (e.code == "KeyA"){
         var data = gVars['floorPlan'].getSaveData();
         console.log(data);
+        gVars['floorPlan'].printData();
     }
 
 }

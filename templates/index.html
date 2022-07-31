@@ -3,16 +3,42 @@
 {% block variables %}
 {% endblock %}
 
-
 {% block content %}
 <div id="edit-main">
     <div id="edit-canvas">
         <canvas id="canvas"></canvas>
     </div>
     <div id="edit-controls">
+        <div class="d-flex justify-content-center">
+            <p id="noProject">No Project Found!</p>
+        </div>
         <form action="/edit" enctype="multipart/form-data">
-            <button id="create_project" class="btn edit">Create New</button>
-        </form> 
+            <button id="create_project" type="submit" class="btn btn-success container-fluid my-1">Create New</button>
+        </form>
+
+        <div id="invTag">
+            <div id="tags">
+                <button type="button" class="btn btn-outline-secondary" data-toggle="button" aria-pressed="false" autocomplete="off">Single toggle</button>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="button" aria-pressed="false" autocomplete="off">Single toggle</button>
+                
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block elements %}
+<script type="text/javascript" src="{{ url_for('static', filename='floorplan.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
+<script>
+    var noProj = document.getElementById('noProject');
+    var project = {{ project | tojson }};
+    if(project != null){
+        noProj.classList.add('hide');
+        init(project);
+    }else{
+        noProj.classList.remove('hide');
+    }
+    
+</script>
 {% endblock %}

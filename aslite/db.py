@@ -89,20 +89,43 @@ class CompressedSqliteDict(SqliteDict):
 # -----------------------------------------------------------------------------
 
 # test database
-TEST_DB_FILE = os.path.join(DATA_DIR, 'test.db')
 PROJECT_DB_FILE = os.path.join(DATA_DIR, 'project.db')
-
-def get_test_db(flag='r', autocommit=True):
-    assert flag in ['r', 'c']
-    tdb = CompressedSqliteDict(TEST_DB_FILE, tablename='test', flag=flag, autocommit=autocommit)
-    return tdb
 
 def get_projects_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag=flag, autocommit=autocommit)
+    tdb.close()
     return tdb
+
+def get_first_project():
+    tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag='r', autocommit=True)
+    for _id, data in tdb.items():
+        tdb.close()
+        return data
+    tdb.close()
+    return None
+
+def get_project_with_name(name = None):
+    tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag='r', autocommit=True)
+    for _id, data in tdb.items():
+        if data['name'] == name:
+            return data
+    tdb.close()
+    return None
 
 def save_project_to_db(data, id):
     tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag='c', autocommit=True)
     tdb[id] = data
+    tdb.close()
+
+def delete_duplicate(name):
+    tdb = CompressedSqliteDict(PROJECT_DB_FILE, tablename='project', flag='c', autocommit=True)
+    _idset = set()
+    for _id, data in tdb.items():
+        if data['name'] == name:
+            _idset.add(_id)
+    print(len(_idset))
+    _idset.pop()
+    for i in _idset:
+        tdb.pop(i)    
     tdb.close()
