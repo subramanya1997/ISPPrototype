@@ -31,6 +31,8 @@
 <script type="text/javascript" src="{{ url_for('static', filename='floorplan.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
 <script>
+    alert("Navigate: /project/<projectName> to go to specific project \nelse first project in the database will get loaded.");
+    alert("Rules: \n 1. Press and hold alt and select start. \n 2. Press and hold shift to select end. \n ");
     var noProj = document.getElementById('noProject');
     var project = {{ project | tojson }};
     if(project != null){

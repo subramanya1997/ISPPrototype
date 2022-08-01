@@ -61,7 +61,7 @@ if __name__ == '__main__':
     @app.route("/edit")
     def edit_page():
         _fields = request.args.to_dict()
-        filename = request.args['filename'] if 'filename' in _fields else None
+        filename = request.args['projectname'] if 'projectname' in _fields else None
         project = None 
         if filename != None:
             project = get_project_with_name(filename)
