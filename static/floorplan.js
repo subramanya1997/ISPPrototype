@@ -1,13 +1,15 @@
 class Floorplan {
-    constructor(project = null, ctx = null, drawPnt = true, drawPth = true){
+    constructor(project = null, ctx = null, drawPnt = true, drawPth = true, canvas = null){
         this.points = new Set();
         this.paths = new Map();
         this.pathMap = new Map();
         this.pointsMap = new Map();
         this.invMap = new Map();
         this.pntSelected = null;
+        this.isEnd = null;
         this.selectStyle = '#ff6961';
         this.defaultStyle = '#91a3b0';
+        this.endStyle = '#C2B280'
         this.mode = 0; // 0 : None, 1: Points, 2: Path 
         this.url = null;
         this.image = null;
@@ -16,8 +18,9 @@ class Floorplan {
         this.id = null;
         this.drawPnt = drawPnt;
         this.drawPth = drawPth;
+        this.canvas = canvas;
+        this.ctx =  ctx;
         if(project != null){
-            this.ctx =  ctx;
             this.#loadFloorPlan(project);
         }
         this.pointPaths = new Set();
@@ -46,12 +49,12 @@ class Floorplan {
         }
     }
     
-    #getColor(isSelected){
-        return isSelected ? this.selectStyle : this.defaultStyle;
+    #getColor(isSelected, isEnd){
+        return isSelected ? this.selectStyle : (isEnd ? this.endStyle : this.defaultStyle);
     }
 
     #drawPoint(pnt, ctx){
-        ctx.fillStyle = this.#getColor(pnt.isSelected);
+        ctx.fillStyle = this.#getColor(pnt.isSelected, pnt.isEnd);
         ctx.fill(pnt);
     }
 
@@ -67,7 +70,7 @@ class Floorplan {
 
     #drawLines(path, ctx){
         ctx.lineWidth = 8;
-        ctx.strokeStyle = this.#getColor(path.isSelected);
+        ctx.strokeStyle = this.#getColor(path.isSelected, path.isEnd);
         ctx.stroke(path);
     }
 
@@ -93,6 +96,7 @@ class Floorplan {
         pnt.arc(x, y, 10, 0, 2 * Math.PI);
         pnt.name = name == null ? "node_"+String(this.cnt) : name;
         pnt.isSelected = false;
+        pnt.isEnd = false;
         pnt.inventory = inv == null ? new Set() : new Set(inv);
         pnt.draw = this.drawPnt;
         pnt.x = x;
@@ -135,22 +139,32 @@ class Floorplan {
 
     deletePoint(pnt, ctx){
         if(pnt == this.pntSelected){
-            this.selectPoint(null, ctx);
+            this.selectPoint(null);
         }
         this.points.delete(pnt);
         this.deletePath(pnt);
         this.draw();
     }
 
-    selectPoint(pnt, _draw=true){
-        //previously selected unselect it
-        if (this.pntSelected != null){
-            this.pntSelected.isSelected = !this.pntSelected.isSelected;
-        }
-        //current is equal to null
-        this.pntSelected = pnt;
-        if (this.pntSelected != null){
-            this.pntSelected.isSelected = !this.pntSelected.isSelected;
+    selectPoint(pnt, _draw=true, isEnd=false){
+        if(isEnd){
+            if(this.isEnd != null){
+                this.isEnd.isEnd = !this.isEnd.isEnd;
+            }
+            this.isEnd = pnt;
+            if (this.isEnd != null){
+                this.isEnd.isEnd = !this.isEnd.isEnd;
+            }
+        }else{
+            //previously selected unselect it
+            if (this.pntSelected != null){
+                this.pntSelected.isSelected = !this.pntSelected.isSelected;
+            }
+            //current is equal to null
+            this.pntSelected = pnt;
+            if (this.pntSelected != null){
+                this.pntSelected.isSelected = !this.pntSelected.isSelected;
+            }
         }
         if(_draw){
             this.draw();
@@ -158,7 +172,7 @@ class Floorplan {
     }
 
     draw(){
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.#drawFloorMap(this.image, this.ctx, this.offsets);
         for(var pnt of this.points){
             if(pnt.draw){
@@ -219,6 +233,7 @@ class Floorplan {
             _path.points.add(pnt2.name);
             _path.draw = this.drawPth;
             _path.isSelected = false;
+            _path.isEnd = false;
             var _x1x2 = _path.x2 - _path.x1;
             var _y1y2 = _path.y2 - _path.y1;
             _path.distance = Math.sqrt( _x1x2*_x1x2 + _y1y2*_y1y2 );
@@ -282,12 +297,12 @@ class Floorplan {
         }
     }
 
-    updatePaths(startPnt, points, first=false){
+    updatePaths(startPnt, points, first=false, end=false){
         var _distance = 100000000000000000000;
         var endPoint = null;
         var path = null;
         if (points.size == 0){
-            return;
+            return startPnt;
         }
         for(var pnt of points){
             var _pntDistance = this.pointsMap.get(startPnt).shortestPaths[pnt].distance ;
@@ -302,13 +317,15 @@ class Floorplan {
                 var _tempName = startPnt + '_' + path[i];
                 this.pathMap.get(_tempName).draw = true;
                 this.pathMap.get(_tempName).isSelected = first;
+                this.pathMap.get(_tempName).isEnd = end;
                 startPnt = path[i];
             }
         }
         points.delete(endPoint);
-        if(!first){
-            this.updatePaths(endPoint, points);
+        if(!first && !end){
+            endPoint = this.updatePaths(endPoint, points);
         }
+        return endPoint;
     }
 
     updatePathsAndPoints(invName=null, add=true){
@@ -318,6 +335,7 @@ class Floorplan {
         for(var [pthN, pth] of this.pathMap){
             pth.draw = false;
             pth.isSelected = false;
+            pth.isEnd = false;
         }
         if(invName != null){
             var pntName =  this.invMap.get(invName);
@@ -334,21 +352,29 @@ class Floorplan {
         for(var pntN of this.pointPaths){
             this.pointsMap.get(pntN).draw = true;
         }
-        this.pointsMap.get(this.pntSelected.name).draw = true;
-        var points = structuredClone(this.pointPaths);
-        this.updatePaths(this.pntSelected.name, points);
-        points = structuredClone(this.pointPaths);
-        this.updatePaths(this.pntSelected.name, points, true);
+        var endPoint = null;
+        if(this.pntSelected != null){
+            this.pointsMap.get(this.pntSelected.name).draw = true;
+            var points = structuredClone(this.pointPaths);
+            endPoint = this.updatePaths(this.pntSelected.name, points);
+            points = structuredClone(this.pointPaths);
+            this.updatePaths(this.pntSelected.name, points, true);
+        }
+        if(this.isEnd != null){
+            this.pointsMap.get(this.isEnd.name).draw = true;
+            if(endPoint != null && this.pointPaths.size != 0){
+                this.updatePaths(this.isEnd.name, new Set([endPoint]), false, true);
+            }
+        }
         this.draw();
     }
 
     showAllpoints(show = true){
         for(var [pntN, pnt] of this.pointsMap){
             pnt.draw = show;
-            if(pnt.isSelected){
+            if(pnt.isSelected || pnt.isEnd){
                 pnt.draw = true;
             }
-
         }
         this.draw();
     }

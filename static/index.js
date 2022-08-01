@@ -10,9 +10,7 @@ function init(project){
 
     /* Global scope */
     gVars['canvas'] = canvas;
-    gVars['floorPlan'] = new Floorplan(project, gVars['canvas'].getContext('2d'), false, false);
-    console.log(gVars['floorPlan']);
-
+    gVars['floorPlan'] = new Floorplan(project, gVars['canvas'].getContext('2d'), false, false, gVars['canvas']);
 
     var invTags = document.getElementById('tags');
     canvas.addEventListener('mousedown', mouseClicked);
@@ -51,6 +49,8 @@ function mouseClicked(e){
     var [isSelected, pnt] = gVars['floorPlan'].getPointUnder(x, y);
     if (e.altKey){
         gVars['floorPlan'].selectPoint(pnt);
+    }else if (e.shiftKey){
+        gVars['floorPlan'].selectPoint(pnt, true, true);
     }else{
         if(pnt.draw){
             //to do completed
@@ -68,18 +68,16 @@ function mouseMove(e){
     }else{
         gVars['floorPlan'].draw();
     }
-
-    
 }
 
 function onkeydown(e){
-    if (e.key == 'Alt'){
+    if (e.key == 'Alt' || e.key == 'Shift'){
         gVars['floorPlan'].showAllpoints();
     }
 }
 
 function onkeyup(e){
-    if (e.key == 'Alt'){
+    if (e.key == 'Alt' || e.key == 'Shift'){
         gVars['floorPlan'].showAllpoints(false);
     }
     gVars['floorPlan'].updatePathsAndPoints();

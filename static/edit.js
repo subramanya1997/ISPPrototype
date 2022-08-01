@@ -17,10 +17,10 @@ function init(){
 
 function initFloorplan(project){
     if(project != null){
-        gVars['floorPlan'] = new Floorplan(project, gVars['canvas'].getContext('2d'));
+        gVars['floorPlan'] = new Floorplan(project, gVars['canvas'].getContext('2d'), true, true, gVars['canvas']);
         projecct_name.value = project.name;
     }else{
-        gVars['floorPlan'] = new Floorplan();
+        gVars['floorPlan'] = new Floorplan(null, gVars['canvas'].getContext('2d'), true, true, gVars['canvas']);
     }
     gVars['mode'] = "point";
     
@@ -40,6 +40,7 @@ function drawImageToCanvas(canvas, imgPath){
         var xOffset = newWidth < canvas.width ? ((canvas.width - newWidth) / 2) : 0;
         var yOffset = newHeight < canvas.height ? ((canvas.height - newHeight) / 2) : 0;
         gVars['floorPlan'].setFloorMap(gVars['pFloorPlan'].name, image, canvas.getContext('2d'), [xOffset, yOffset]);
+        gVars['floorPlan'].draw();
     }
     image.src = imgPath;
 }
@@ -193,6 +194,7 @@ function mouseClicked(e){
 selectFileButton.onchange = function(){
     const [file] = selectFileButton.files;
     if (file) {
+        
         gVars['pFloorPlan'] = file;
         drawImageToCanvas(gVars['canvas'], URL.createObjectURL(gVars['pFloorPlan']));
     }
