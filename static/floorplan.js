@@ -6,8 +6,8 @@ class Floorplan {
         this.pointsMap = new Map();
         this.invMap = new Map();
         this.pntSelected = null;
-        this.selectStyle = 'red';
-        this.defaultStyle = 'black';
+        this.selectStyle = '#ff6961';
+        this.defaultStyle = '#91a3b0';
         this.mode = 0; // 0 : None, 1: Points, 2: Path 
         this.url = null;
         this.image = null;
@@ -55,6 +55,16 @@ class Floorplan {
         ctx.fill(pnt);
     }
 
+    onhover(pnt){
+        var text = ''
+        for(var _t of pnt.showInv){
+            text += _t + '  ';
+        }
+        this.ctx.fillStyle = '#4d5d53';
+        this.ctx.font = "12pt Arial";
+        this.ctx.fillText(text, pnt.x, pnt.y - 15);
+    }
+
     #drawLines(path, ctx){
         ctx.lineWidth = 8;
         ctx.strokeStyle = this.#getColor(path.isSelected);
@@ -88,6 +98,7 @@ class Floorplan {
         pnt.x = x;
         pnt.y = y;
         pnt.shortestPaths = shortestPaths == null ? new Map() : shortestPaths
+        pnt.showInv = new Set();
         for(var _inv of pnt.inventory){
             this.invMap.set(_inv, pnt.name);
         }
@@ -312,9 +323,12 @@ class Floorplan {
             var pntName =  this.invMap.get(invName);
             if(add){
                 this.pointPaths.add(pntName);
-                
+                this.pointsMap.get(pntName).showInv.add(invName);
             }else{
-                this.pointPaths.delete(pntName);
+                this.pointsMap.get(pntName).showInv.delete(invName);
+                if(this.pointsMap.get(pntName).showInv.size == 0){
+                    this.pointPaths.delete(pntName);
+                }
             }
         }
         for(var pntN of this.pointPaths){
