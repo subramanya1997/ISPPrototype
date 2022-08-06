@@ -9,7 +9,7 @@
 ### Run
 
 ```bash
-    python setup.py
+python setup.py
 ```
 
  Development Mode
