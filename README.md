@@ -8,6 +8,10 @@
 
 ### Run
 
+```bash
+    python setup.py
+```
+
  Development Mode
 
  ```bash
