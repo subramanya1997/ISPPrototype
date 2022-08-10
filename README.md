@@ -5,12 +5,13 @@ Its a prototype for map viewer which can be modified to integrated with any IPS 
 1. Create Nodes across warehouse 
 2. Create Path across warehouse 
 3. Add inventory for each node
-4. Display the shortest path from start to end nodes along inventories selected
+4. Display the shortest path from start to end nodes alon selected inventories 
 
 ## Screenshot 
-
-![edit page](edit.png?raw=true "Edit the nodes in the floorplan")
-![Shortest path page](shortestPath.png?raw=true "Shortest path while picking along the inventory")
+Edit the nodes, path, inventory in the floorplan
+![edit page](edit.png?raw=true)
+Shortest path while picking along the selected invntories
+![Shortest path page](shortestPath.png?raw=true)
 
 ### Requirements
 
@@ -23,7 +24,7 @@ Its a prototype for map viewer which can be modified to integrated with any IPS 
 ### Run
 
 ```bash
-python setup.py
+    python setup.py
 ```
 
  Development Mode
