@@ -24,7 +24,7 @@ Shortest path while picking along the selected invntories
 ### Run
 
 ```bash
-    python setup.py
+python setup.py
 ```
 
  Development Mode
