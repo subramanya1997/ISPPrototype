@@ -23,7 +23,7 @@ Its a prototype for map viewer which can be modified to integrated with any IPS 
 ### Run
 
 ```bash
-    python setup.py
+python setup.py
 ```
 
  Development Mode
