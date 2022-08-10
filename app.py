@@ -81,7 +81,6 @@ if __name__ == '__main__':
             data = json.loads(request.form['hdata'])
             data['id'] = str(uuid.uuid1()) if data['id'] == None else data['id']
             data['name'] = request.form['name']
-            print(data)
             save_project_to_db(data, data['id'])
             return render_template('edit.html', project=None)
         else:
