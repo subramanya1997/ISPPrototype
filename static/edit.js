@@ -184,10 +184,11 @@ function mouseClicked(e){
     var [x, y] = getPosition(e);
     var ctx = gVars['canvas'].getContext('2d');
     var [isSelected, pnt] = gVars['floorPlan'].getPointUnder(x, y, ctx);
+    console.log(e);
     if(gVars['mode'] == "point"){
-        mouseClickedOnPointMode(pnt, ctx, isSelected, e.metaKey, x, y)
+        mouseClickedOnPointMode(pnt, ctx, isSelected, e.ctrlKey || e.metaKey, x, y)
     }else{
-        mouseClickedOnPathMode(pnt, ctx, isSelected, e.metaKey)
+        mouseClickedOnPathMode(pnt, ctx, isSelected, e.ctrlKey || e.metaKey)
     }
 }
 
